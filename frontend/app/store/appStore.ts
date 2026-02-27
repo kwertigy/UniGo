@@ -34,25 +34,35 @@ interface AppState {
 }
 
 const safeSetItem = async (key: string, value: string) => {
-  if (Platform.OS !== 'web') {
-    try {
+  try {
+    if (Platform.OS === 'web') {
+      // Use localStorage on web
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, value);
+      }
+    } else {
       await AsyncStorage.setItem(key, value);
-    } catch (e) {
-      console.warn('Storage error:', e);
     }
+  } catch (e) {
+    console.warn('Storage error:', e);
   }
 };
 
 const safeGetItem = async (key: string): Promise<string | null> => {
-  if (Platform.OS !== 'web') {
-    try {
-      return await AsyncStorage.getItem(key);
-    } catch (e) {
-      console.warn('Storage error:', e);
+  try {
+    if (Platform.OS === 'web') {
+      // Use localStorage on web
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
       return null;
+    } else {
+      return await AsyncStorage.getItem(key);
     }
+  } catch (e) {
+    console.warn('Storage error:', e);
+    return null;
   }
-  return null;
 };
 
 export const useAppStore = create<AppState>((set, get) => ({

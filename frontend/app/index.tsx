@@ -25,16 +25,22 @@ export default function Index() {
   const [showPayment, setShowPayment] = useState(false);
   const [selectedTier, setSelectedTier] = useState<SubscriptionTier | null>(null);
   const [showVibeCheck, setShowVibeCheck] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const toggleAnim = useRef(new Animated.Value(0)).current;
   const bgColorAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     loadPersistedData().then(() => {
-      if (!isOnboarded) {
-        setTimeout(() => setShowOnboarding(true), 300);
-      }
+      setIsLoading(false);
     });
   }, []);
+
+  // Show onboarding after loading completes if not onboarded
+  useEffect(() => {
+    if (!isLoading && !isOnboarded) {
+      setTimeout(() => setShowOnboarding(true), 300);
+    }
+  }, [isLoading, isOnboarded]);
 
   useEffect(() => {
     Animated.spring(toggleAnim, {
@@ -80,6 +86,16 @@ export default function Index() {
     inputRange: [0, 1],
     outputRange: [COLORS.backgroundRider, COLORS.backgroundDriver],
   });
+
+  // Show loading screen while checking persisted data
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' }]}>
+        <Ionicons name="car-sport" size={64} color={COLORS.orange} />
+        <Text style={{ color: COLORS.white, marginTop: 16, fontSize: 18 }}>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <Animated.View style={[styles.container, { backgroundColor }]}>

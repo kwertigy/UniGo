@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SPACING, BORDER_RADIUS, FONTS, COLLEGES } from '../constants/theme';
 import { useAppStore } from '../store/appStore';
+import apiService from '../services/api';
 
 const { width, height } = Dimensions.get('window');
 
@@ -84,25 +85,57 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ visible, onCom
     return true;
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     if (!validateEmail(email)) {
       return;
     }
     
     setStep('verifying');
-    setTimeout(() => {
+    
+    try {
+      // Try to create user via API, fall back to local if API fails
+      const userName = email.split('@')[0];
+      let user;
+      
+      try {
+        user = await apiService.createUser({
+          name: userName,
+          email,
+          college: selectedCollege,
+        });
+      } catch (apiError) {
+        // API might be down, create local user
+        console.log('API unavailable, using local user:', apiError);
+        user = {
+          id: Date.now().toString(),
+          name: userName,
+          email,
+          college: selectedCollege,
+          ecoScore: 0,
+          verified: true,
+        };
+      }
+      
       setStep('success');
       setUser({
-        id: Date.now().toString(),
-        name: email.split('@')[0],
-        email,
+        id: user.id,
+        name: user.name,
+        email: user.email,
         college: selectedCollege,
-        ecoScore: 0,
+        ecoScore: user.ecoScore || 0,
         verified: true,
       });
       setCollege(selectedCollege);
+      
+      // Connect WebSocket for real-time updates
+      apiService.connectWebSocket(user.id);
+      
       setTimeout(() => onComplete(), 1500);
-    }, 2000);
+    } catch (error) {
+      console.error('Verification error:', error);
+      Alert.alert('Error', 'Failed to verify. Please try again.');
+      setStep('email');
+    }
   };
 
   if (!visible) return null;

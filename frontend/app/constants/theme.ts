@@ -46,10 +46,35 @@ export const COLORS = {
   blue: '#0A84FF',
   gold: '#FFD700',
   
+  // Additional Colors
+  electricBlue: '#00D9FF',
+  emeraldGreen: '#32D74B',
+  pink: '#FF69B4',
+  
   // Glassmorphism
   glassDark: 'rgba(28, 28, 30, 0.15)',
   glassLight: 'rgba(255, 255, 255, 0.1)',
   blur: 'rgba(0, 0, 0, 0.3)',
+  
+  // Gradients
+  meshStart: '#0A0A0A',
+  meshEnd: '#1A1A1D',
+  
+  // Alpha variations
+  whiteAlpha40: 'rgba(255, 255, 255, 0.4)',
+  whiteAlpha60: 'rgba(255, 255, 255, 0.6)',
+  whiteAlpha80: 'rgba(255, 255, 255, 0.8)',
+  whiteAlpha90: 'rgba(255, 255, 255, 0.9)',
+  
+  // High contrast colors for Driver dashboard
+  driverText: '#FFFFFF',
+  driverTextSecondary: '#E0E0E0',
+  driverTextMuted: '#B0B0B0',
+  
+  // Slate colors for backgrounds
+  slate700: '#334155',
+  slate800: '#1E293B',
+  slate900: '#0F172A',
 };
 
 export const SPACING = {
